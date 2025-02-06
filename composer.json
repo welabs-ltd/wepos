@@ -16,12 +16,12 @@
     "ext-json": "*"
   },
   "require-dev": {
-    "wp-coding-standards/wpcs": "dev-master",
+    "wp-coding-standards/wpcs": "*",
     "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1"
   },
-  "autoload" : {
+  "autoload": {
     "psr-4": {
-        "WeDevs\\WePOS\\": "includes/"
+      "WeDevs\\WePOS\\": "includes/"
     }
   },
   "scripts": {
