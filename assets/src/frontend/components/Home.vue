@@ -761,7 +761,7 @@ export default {
         '$route.query.order_key'() {
             if ( this.$route.query.order_key != '' && this.$route.query.payment == 'success' ) {
                 this.showModal = false;
-                this.showPaymentReceipt = true;    
+                this.showPaymentReceipt = true;
             };
         },
         '$route.query.category'() {
