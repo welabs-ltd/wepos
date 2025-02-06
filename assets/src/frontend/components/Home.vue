@@ -549,6 +549,14 @@
                             </div>
                             <template v-if="orderdata.payment_method=='wepos_cash'">
                                 <div class="payment-option">
+                                    <div class="shopping-loader">
+                                        <component
+                                            v-for="(value, key ) in lottiShippingLoader"
+                                            v-if="isOrderProcessing"
+                                            :key="key"
+                                            :is="value"
+                                        />
+                                    </div>
                                     <div class="payment-amount">
                                         <div class="input-part">
                                             <div class="input-wrap">
@@ -669,6 +677,7 @@ export default {
             selectedCategory: '',
             selectedGateway: '',
             categories: [],
+            isOrderProcessing: false,
             showReceiptHtml: wepos.hooks.applyFilters( 'wepos_render_receipt_html', true ),
             quickLinkList: wepos.hooks.applyFilters( 'wepos_quick_links', [] ),
             quickLinkListStart: wepos.hooks.applyFilters( 'wepos_quick_links_start', [] ),
@@ -677,6 +686,7 @@ export default {
             beforCartPanels: wepos.hooks.applyFilters( 'wepos_before_cart_panel', [] ),
             couponData: {},
             afterPaymentContents: wepos.hooks.applyFilters( 'wepos_after_payment_content', [] ),
+            lottiShippingLoader: wepos.hooks.applyFilters( 'lotti_shopping_loader', [] ),
         }
     },
     computed: {
@@ -751,7 +761,7 @@ export default {
         '$route.query.order_key'() {
             if ( this.$route.query.order_key != '' && this.$route.query.payment == 'success' ) {
                 this.showModal = false;
-                this.showPaymentReceipt = true;
+                this.showPaymentReceipt = true;    
             };
         },
         '$route.query.category'() {
@@ -888,8 +898,9 @@ export default {
                     ]
                 }, this.orderdata, this.cartdata );
 
-            var $contentWrap = jQuery('.wepos-checkout-wrapper');
-            $contentWrap.block({ message: null, overlayCSS: { background: '#fff url(' + wepos.ajax_loader + ') no-repeat center', opacity: 0.4 } });
+            // var $contentWrap = jQuery('.wepos-checkout-wrapper');
+            // $contentWrap.block({ message: null, overlayCSS: { background: '#fff url(' + wepos.ajax_loader + ') no-repeat center', opacity: 0.4 } });
+            this.isOrderProcessing = true;
 
             wepos.api.post( wepos.rest.root + wepos.rest.wcversion + '/orders', orderdata )
             .done( response => {
@@ -932,16 +943,24 @@ export default {
                             cashamount: this.cashAmount.toString(),
                             changeamount: this.changeAmount.toString()
                         }, orderdata, response );
-                      $contentWrap.unblock();
+                    this.isOrderProcessing = false;
+
+                    //   $contentWrap.unblock();
                     } else {
-                        $contentWrap.unblock();
+                        this.isOrderProcessing = false;
+
+                        // $contentWrap.unblock();
                     }
                 }).fail( data => {
-                    $contentWrap.unblock();
+                    this.isOrderProcessing = false;
+
+                    // $contentWrap.unblock();
                     alert( data.responseJSON.message );
                 });
             }).fail( response => {
-                $contentWrap.unblock();
+                this.isOrderProcessing = false;
+
+                // $contentWrap.unblock();
                 alert( response.responseJSON.message );
             } );
         },
