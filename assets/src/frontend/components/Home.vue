@@ -593,7 +593,7 @@
 
                         <div class="footer wepos-clearfix">
                             <a href="#" class="back-btn wepos-left" @click.prevent="backToSale()">{{ __( 'Back to Sale', 'wepos' ) }}</a>
-                            <button class="process-checkout-btn wepos-right" @click.prevent="processPayment" :disabled="! $store.getters['Order/getCanProcessPayment']">{{ __( 'Process Payment', 'wepos' ) }}</button>
+                            <!-- <button class="process-checkout-btn wepos-right" @click.prevent="processPayment" :disabled="! $store.getters['Order/getCanProcessPayment']">{{ __( 'Process Payment', 'wepos' ) }}</button> -->
                         </div>
                     </div>
                 </div>
