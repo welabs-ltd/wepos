@@ -790,6 +790,7 @@ export default {
             this.printdata = wepos.hooks.applyFilters( 'wepos_after_payment_print_data', {
                 line_items: this.cartdata.line_items,
                 fee_lines: this.cartdata.fee_lines,
+                coupon_lines: this.cartdata.coupon_lines,
                 subtotal: this.$store.getters['Cart/getSubtotal'],
                 taxtotal: this.$store.getters['Cart/getTotalTax'],
                 ordertotal: this.$store.getters['Cart/getTotal'],
