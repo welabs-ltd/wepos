@@ -593,7 +593,7 @@
 
                         <div class="footer wepos-clearfix">
                             <a href="#" class="back-btn wepos-left" @click.prevent="backToSale()">{{ __( 'Back to Sale', 'wepos' ) }}</a>
-                            <button v-if="selectedGateway === 'wepos_card'" class="process-checkout-btn wepos-right" @click.prevent="processPayment" :disabled="! $store.getters['Order/getCanProcessPayment']">{{ __( 'Process Payment', 'wepos' ) }}</button>
+                            <button v-if="selectedGateway === 'stripe_terminal'" class="process-checkout-btn wepos-right" @click.prevent="processPayment" :disabled="! $store.getters['Order/getCanProcessPayment']">{{ __( 'Process Payment', 'wepos' ) }}</button>
                         </div>
                     </div>
                 </div>
@@ -1186,7 +1186,9 @@ export default {
             this.$store.dispatch( 'Cart/removeItemQuantityAction', key );
         },
         fetchGateway() {
-            wepos.api.get( wepos.rest.root + wepos.rest.posversion + '/payment/gateways' )
+            var outlet = JSON.parse( localStorage.getItem('wepos_outlet') );
+            var outletId = outlet.id;
+            wepos.api.get( wepos.rest.root + wepos.rest.posversion + '/payment/gateways', { outlet_id: outletId }  )
             .done( response => {
                 this.availableGateways = response;
                 this.emptyGatewayDiv = 4-(this.availableGateways.length%4);
