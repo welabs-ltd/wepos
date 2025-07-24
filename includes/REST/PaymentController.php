@@ -77,6 +77,15 @@ class PaymentController extends \WC_REST_Orders_Controller {
      * @return \WP_Error|\WP_HTTP_Response|\WP_REST_Response
      */
     public function get_available_gateways( $request ) {
+        $outlet_id = $request->get_param('outlet_id');
+        $vendor_id   = dokan_get_current_user_id();
+        $outlet_data = get_user_meta( $vendor_id, "_booxos_outlet_$outlet_id", true ) ?? array();
+		$readers     = isset( $outlet_data['readers'] ) ? $outlet_data['readers'] : array();
+
+        if( ! count( $readers ) ) {
+            add_filter( 'wepos_register_gateway', [ $this, 'register_payment_gateway' ], 10 );
+        }
+
         $available_gateways = wepos()->gateways->available_gateway();
         $gateways = [];
 
@@ -87,6 +96,12 @@ class PaymentController extends \WC_REST_Orders_Controller {
         return rest_ensure_response( $gateways );
     }
 
+    public function register_payment_gateway( $gateways ) {
+		$gateways['WeLabs\Booxos\StripeCard'] = BOOXOS_INC_DIR . '/StripeCard.php';
+
+		return $gateways;
+	}
+
     /**
      * Return calculate order data
      *
@@ -95,6 +110,7 @@ class PaymentController extends \WC_REST_Orders_Controller {
      * @return \WP_Error|\WP_HTTP_Response|\WP_REST_Response
      */
     public function process_payment( $request ) {
+        \error_log("REQUEST payment/process : " . print_r($request, true));
         $available_gateways = wepos()->gateways->available_gateway();
         $chosen_gateway = '';
 
