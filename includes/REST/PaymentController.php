@@ -85,7 +85,7 @@ class PaymentController extends \WC_REST_Orders_Controller {
         $available_gateways = wepos()->gateways->available_gateway();
 
         if( count( $readers ) > 0 ) {
-            unset($available_gateways['WeLabs\Booxos\StripeCard']);
+            unset($available_gateways['WeDevs\WePOSPro\Gateways\Card']);
         }
 
         $gateways = [];
