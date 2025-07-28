@@ -105,7 +105,6 @@ class PaymentController extends \WC_REST_Orders_Controller {
      * @return \WP_Error|\WP_HTTP_Response|\WP_REST_Response
      */
     public function process_payment( $request ) {
-        \error_log("REQUEST payment/process : " . print_r($request, true));
         $available_gateways = wepos()->gateways->available_gateway();
         $chosen_gateway = '';
 
