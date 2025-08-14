@@ -77,17 +77,7 @@ class PaymentController extends \WC_REST_Orders_Controller {
      * @return \WP_Error|\WP_HTTP_Response|\WP_REST_Response
      */
     public function get_available_gateways( $request ) {
-        $outlet_id = $request->get_param('outlet_id');
-        $vendor_id   = dokan_get_current_user_id();
-        $outlet_data = get_user_meta( $vendor_id, "_booxos_outlet_$outlet_id", true ) ?? array();
-		$readers     = isset( $outlet_data['readers'] ) ? $outlet_data['readers'] : array();
-
-        $available_gateways = wepos()->gateways->available_gateway();
-
-        if( count( $readers ) > 0 ) {
-            unset($available_gateways['WeDevs\WePOSPro\Gateways\Card']);
-        }
-
+        $available_gateways = apply_filters( "wepos_rest_available_gateway", wepos()->gateways->available_gateway(), $request );
         $gateways = [];
 
         foreach ( $available_gateways as $class => $path ) {
