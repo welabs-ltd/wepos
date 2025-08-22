@@ -549,14 +549,6 @@
                             </div>
                             <template v-if="orderdata.payment_method=='wepos_cash'">
                                 <div class="payment-option">
-                                    <div class="shopping-loader">
-                                        <component
-                                            v-for="(value, key ) in lottiShippingLoader"
-                                            v-if="isOrderProcessing"
-                                            :key="key"
-                                            :is="value"
-                                        />
-                                    </div>
                                     <div class="payment-amount">
                                         <div class="input-part">
                                             <div class="input-wrap">
@@ -593,16 +585,15 @@
 
                         <div class="footer wepos-clearfix">
                             <a href="#" class="back-btn wepos-left" @click.prevent="backToSale()">{{ __( 'Back to Sale', 'wepos' ) }}</a>
-                            <!-- <button v-if="selectedGateway === 'wepos_card'" class="process-checkout-btn wepos-right" @click.prevent="processPayment" :disabled="! $store.getters['Order/getCanProcessPayment']">{{ __( 'Process Payment', 'wepos' ) }}</button> -->
-                            <button
-                                v-if="selectedGateway === 'wepos_card'"
-                                class="process-checkout-btn wepos-right"
-                                :class="{ 'button-loading': isOrderProcessing }"
-                                @click.prevent="processPayment"
-                                :disabled="!$store.getters['Order/getCanProcessPayment'] || isOrderProcessing"
-                            >
-                                {{ __( 'Process Payment', 'wepos' ) }}
-                            </button>
+                            <button class="process-checkout-btn wepos-right" @click.prevent="processPayment" :disabled="! $store.getters['Order/getCanProcessPayment']">{{ __( 'Process Payment', 'wepos' ) }}</button>
+                            <component
+                                v-for="(afterPaymentButton, key ) in afterPaymentButtons"
+                                :key="key"
+                                :is="afterPaymentButton"
+                                :selectedGateway="selectedGateway"
+                                :cashAmount="cashAmount"
+                                @payment-success="handlePaymentSuccess"
+                            />
                         </div>
                     </div>
                 </div>
@@ -686,7 +677,6 @@ export default {
             selectedCategory: '',
             selectedGateway: '',
             categories: [],
-            isOrderProcessing: false,
             showReceiptHtml: wepos.hooks.applyFilters( 'wepos_render_receipt_html', true ),
             quickLinkList: wepos.hooks.applyFilters( 'wepos_quick_links', [] ),
             quickLinkListStart: wepos.hooks.applyFilters( 'wepos_quick_links_start', [] ),
@@ -695,7 +685,7 @@ export default {
             beforCartPanels: wepos.hooks.applyFilters( 'wepos_before_cart_panel', [] ),
             couponData: {},
             afterPaymentContents: wepos.hooks.applyFilters( 'wepos_after_payment_content', [] ),
-            lottiShippingLoader: wepos.hooks.applyFilters( 'lotti_shopping_loader', [] ),
+            afterPaymentButtons: wepos.hooks.applyFilters( 'wepos_after_payment_buttons', [] ),
         }
     },
     computed: {
@@ -908,9 +898,8 @@ export default {
                     ]
                 }, this.orderdata, this.cartdata );
 
-            // var $contentWrap = jQuery('.wepos-checkout-wrapper');
-            // $contentWrap.block({ message: null, overlayCSS: { background: '#fff url(' + wepos.ajax_loader + ') no-repeat center', opacity: 0.4 } });
-            this.isOrderProcessing = true;
+            var $contentWrap = jQuery('.wepos-checkout-wrapper');
+            $contentWrap.block({ message: null, overlayCSS: { background: '#fff url(' + wepos.ajax_loader + ') no-repeat center', opacity: 0.4 } });
 
             wepos.api.post( wepos.rest.root + wepos.rest.wcversion + '/orders', orderdata )
             .done( response => {
@@ -937,6 +926,7 @@ export default {
                                 payment: 'success'
                             }
                         });
+
                         this.printdata = wepos.hooks.applyFilters( 'wepos_after_payment_print_data', {
                             line_items: this.cartdata.line_items,
                             fee_lines: this.cartdata.fee_lines,
@@ -952,25 +942,18 @@ export default {
                             order_date: response.date_created,
                             cashamount: this.cashAmount.toString(),
                             changeamount: this.changeAmount.toString()
-                        }, orderdata, response );
-                    this.isOrderProcessing = false;
+                        }, orderdata );
 
-                    //   $contentWrap.unblock();
+                        $contentWrap.unblock();
                     } else {
-                        this.isOrderProcessing = false;
-
-                        // $contentWrap.unblock();
+                        $contentWrap.unblock();
                     }
                 }).fail( data => {
-                    this.isOrderProcessing = false;
-
-                    // $contentWrap.unblock();
+                    $contentWrap.unblock();
                     alert( data.responseJSON.message );
                 });
             }).fail( response => {
-                this.isOrderProcessing = false;
-
-                // $contentWrap.unblock();
+                $contentWrap.unblock();
                 alert( response.responseJSON.message );
             } );
         },
@@ -1301,6 +1284,9 @@ export default {
             let inputCashAmount = document.querySelector('#input-cash-amount');
             inputCashAmount.focus();
         },
+        handlePaymentSuccess(printData) {
+            this.printdata = printData;
+        }
     },
 
     async created() {
