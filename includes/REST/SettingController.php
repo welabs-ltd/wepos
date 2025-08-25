@@ -78,7 +78,6 @@ class SettingController extends \WP_REST_Controller {
 			'wc_tax_display_shop' => $tax_display_on_shop,
 			'wc_tax_display_cart' => $tax_display_on_cart,
 		];
-		$settings = apply_filters( 'wepos_rest_settings', $settings, $request );
 
 		return rest_ensure_response( $settings );
 	}
