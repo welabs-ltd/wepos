@@ -592,7 +592,6 @@
                                 :is="afterPaymentButton"
                                 :selectedGateway="selectedGateway"
                                 :cashAmount="cashAmount"
-                                @payment-success="handlePaymentSuccess"
                             />
                         </div>
                     </div>
@@ -1283,9 +1282,6 @@ export default {
         focusCashInput() {
             let inputCashAmount = document.querySelector('#input-cash-amount');
             inputCashAmount.focus();
-        },
-        handlePaymentSuccess(printData) {
-            this.printdata = printData;
         }
     },
 
