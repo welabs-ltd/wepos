@@ -1158,9 +1158,7 @@ export default {
             this.$store.dispatch( 'Cart/removeItemQuantityAction', key );
         },
         fetchGateway() {
-            var outlet = JSON.parse( localStorage.getItem('wepos_outlet') );
-            var outletId = outlet.id;
-            wepos.api.get( wepos.rest.root + wepos.rest.posversion + '/payment/gateways', { outlet_id: outletId }  )
+            wepos.api.get( wepos.rest.root + wepos.rest.posversion + '/payment/gateways' )
             .done( response => {
                 this.availableGateways = response;
                 this.emptyGatewayDiv = 4-(this.availableGateways.length%4);
