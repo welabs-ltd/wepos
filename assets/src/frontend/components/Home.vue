@@ -579,7 +579,6 @@
                                 :key="key"
                                 :is="availableGatewayComponent"
                                 :availablegateways="availableGateways"
-                                @card-print-ready="handleCardReceiptPrint"
                             />
                         </div>
 
@@ -784,24 +783,6 @@ export default {
     },
 
     methods: {
-        handleCardReceiptPrint(response) {
-            this.printdata = wepos.hooks.applyFilters( 'wepos_after_payment_print_data', {
-                line_items: this.cartdata.line_items,
-                fee_lines: this.cartdata.fee_lines,
-                coupon_lines: this.cartdata.coupon_lines,
-                subtotal: this.$store.getters['Cart/getSubtotal'],
-                taxtotal: this.$store.getters['Cart/getTotalTax'],
-                ordertotal: this.$store.getters['Cart/getTotal'],
-                gateway: {
-                    id: response.payment_method,
-                    title: response.payment_method_title
-                },
-                order_id: response.id,
-                order_date: response.date_created,
-                cashamount: this.cashAmount.toString(),
-                changeamount: this.changeAmount.toString()
-            }, this.orderdata, response );
-        },
         openQucikMenu() {
             this.showQucikMenu = true;
         },
@@ -941,7 +922,7 @@ export default {
                             order_date: response.date_created,
                             cashamount: this.cashAmount.toString(),
                             changeamount: this.changeAmount.toString()
-                        }, orderdata );
+                        }, orderdata, response );
 
                         $contentWrap.unblock();
                     } else {
