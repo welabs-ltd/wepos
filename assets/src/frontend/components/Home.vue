@@ -565,11 +565,10 @@
                                     </div>
                                     <component
                                         v-for="(value, key ) in afterPaymentContents"
-                                        v-model="cashAmount" 
-                                        @back-to-sale="backToSale()"
-                                        @pos-pay="processPayment"
                                         :key="key"
                                         :is="value"
+                                        :selectedGateway="selectedGateway"
+                                        :cashAmount="cashAmount"
                                     />
                                 </div>
                             </template>
